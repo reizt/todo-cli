@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	controller "github.com/reizt/todo/src/adapters/controller/cmd"
@@ -8,12 +9,25 @@ import (
 	"github.com/reizt/todo/src/adapters/renderer/console"
 	"github.com/reizt/todo/src/adapters/repository/sqlite"
 	"github.com/reizt/todo/src/core"
+	"github.com/reizt/todo/src/utils"
 )
 
 func main() {
-	repository, _ := sqlite.Init()
-	renderer, _ := console.Init()
-	prompt, _ := prompt.Init()
+	repository, err := sqlite.Init()
+	if err != nil {
+		utils.PrintRed(fmt.Sprintf("ERROR: unexpected error occured!\n%s\n", err.Error()))
+		return
+	}
+	renderer, err := console.Init()
+	if err != nil {
+		utils.PrintRed(fmt.Sprintf("ERROR: unexpected error occured!\n%s\n", err.Error()))
+		return
+	}
+	prompt, err := prompt.Init()
+	if err != nil {
+		utils.PrintRed(fmt.Sprintf("ERROR: unexpected error occured!\n%s\n", err.Error()))
+		return
+	}
 
 	app := core.App{
 		Repository: repository,

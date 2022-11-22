@@ -49,6 +49,10 @@ func migrate(db *sql.DB) error {
 
 func Init() (*repository, error) {
 	storagePath := os.Getenv("TODO_CLI_SQLITE_STORAGE_PATH")
+	if storagePath == "" {
+		fmt.Println("A environment variable $TODO_CLI_SQLITE_STORAGE_PATH is not set")
+		return nil, ErrDatabaseInit
+	}
 	db, err := sql.Open("sqlite3", storagePath)
 	if err != nil {
 		fmt.Println(err.Error())
