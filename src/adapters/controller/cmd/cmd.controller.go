@@ -23,8 +23,7 @@ func (controller *Controller) Exec(osArgs []string) {
 		return
 	}
 
-	firstArg := osArgs[1]
-	switch firstArg {
+	switch osArgs[1] {
 	case "-h", "--help":
 		controller.App.Help()
 	case "-v", "--version":
@@ -75,12 +74,16 @@ func newAddInput(osArgs []string) *core.AddInput {
 	title := (*string)(nil)
 	description := (*string)(nil)
 
-	for i, arg := range osArgs {
-		if arg == "-t" || arg == "--title" {
+	for i := 0; i < len(osArgs); i++ {
+		if osArgs[i] == "-t" || osArgs[i] == "--title" {
 			title = &osArgs[i+1]
+			i++
+			continue
 		}
-		if arg == "-d" || arg == "--description" {
+		if osArgs[i] == "-d" || osArgs[i] == "--description" {
 			description = &osArgs[i+1]
+			i++
+			continue
 		}
 	}
 	input := core.AddInput{
@@ -107,12 +110,16 @@ func newModInput(osArgs []string) *core.ModInput {
 	title := (*string)(nil)
 	description := (*string)(nil)
 
-	for i, arg := range osArgs {
-		if arg == "-t" || arg == "--title" {
+	for i := 0; i < len(osArgs); i++ {
+		if osArgs[i] == "-t" || osArgs[i] == "--title" {
 			title = &osArgs[i+1]
+			i++
+			continue
 		}
-		if arg == "-d" || arg == "--description" {
+		if osArgs[i] == "-d" || osArgs[i] == "--description" {
 			description = &osArgs[i+1]
+			i++
+			continue
 		}
 	}
 

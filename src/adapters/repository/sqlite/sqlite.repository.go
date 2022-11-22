@@ -151,7 +151,7 @@ func (repo repository) Update(id string, input core.IRepositoryUpdateInput) (err
 			todoColumnNames.ID,
 		)
 		_, err = repo.db.Exec(updateQuery, input.Title, id)
-	} else {
+	} else if input.Description != nil {
 		updateQuery := fmt.Sprintf(
 			"UPDATE %s SET %s = ? WHERE %s = ?;",
 			todoTableName,
