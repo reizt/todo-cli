@@ -59,11 +59,15 @@ type AddInput struct {
 
 func (app *App) Add(input AddInput) {
 	id := newId()
+	IsCompleted := false
+	if input.IsCompleted != nil && *input.IsCompleted {
+		IsCompleted = true
+	}
 	todo := Todo{
 		ID:          id,
 		Title:       input.Title,
 		Description: input.Description,
-		IsCompleted: input.IsCompleted,
+		IsCompleted: &IsCompleted,
 	}
 	isValid := app.validateTodo(todo)
 	if !isValid {

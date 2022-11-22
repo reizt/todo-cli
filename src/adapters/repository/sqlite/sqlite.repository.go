@@ -123,7 +123,7 @@ func (repo repository) FindById(id string) (*(core.Todo), error) {
 
 func (repo repository) Insert(input core.IRepositoryInsertInput) (*core.Todo, error) {
 	insertQuery := fmt.Sprintf(
-		"INSERT INTO %s (%s, %s, %s), %s VALUES (?, ?, ?, ?);",
+		"INSERT INTO %s (%s, %s, %s, %s) VALUES (?, ?, ?, ?);",
 		todoTableName,
 		todoColumnNames.ID,
 		todoColumnNames.Title,
@@ -132,6 +132,8 @@ func (repo repository) Insert(input core.IRepositoryInsertInput) (*core.Todo, er
 	)
 	_, err := repo.db.Exec(insertQuery, input.ID, input.Title, input.Description, input.IsCompleted)
 	if err != nil {
+		fmt.Println(err.Error())
+		fmt.Println(insertQuery)
 		return nil, core.ErrRepositoryInsertFailed
 	}
 
