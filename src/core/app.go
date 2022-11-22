@@ -114,7 +114,7 @@ func (app *App) Mod(input ModInput) {
 		return
 	}
 
-	err = app.Repository.Update(input.ID, IRepositoryUpdateInput{
+	err = app.Repository.Update(todo.ID, IRepositoryUpdateInput{
 		Title:       input.Title,
 		Description: input.Description,
 	})
@@ -152,7 +152,7 @@ func (app *App) Del(input DelInput) {
 		return
 	}
 
-	err = app.Repository.Delete(input.ID)
+	err = app.Repository.Delete(todo.ID)
 	if err != nil {
 		app.Renderer.DelFailed(err)
 		return

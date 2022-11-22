@@ -95,8 +95,8 @@ func (repo repository) FindMany(input core.IRepositoryFindManyInput) (*([]core.T
 }
 
 func (repo repository) FindById(id string) (*(core.Todo), error) {
-	selectQuery := "SELECT * FROM todo WHERE " + todoColumnNames.ID + " = ?;"
-	row := repo.db.QueryRow(selectQuery, id)
+	selectQuery := "SELECT * FROM todo WHERE " + todoColumnNames.ID + " LIKE ?;"
+	row := repo.db.QueryRow(selectQuery, id+"%")
 	if err := row.Err(); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, core.ErrRepositoryNotFound
