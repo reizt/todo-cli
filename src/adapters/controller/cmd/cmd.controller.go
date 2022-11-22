@@ -4,6 +4,8 @@ import (
 	"errors"
 	"os"
 
+	"github.com/reizt/todo/src/utils"
+
 	"github.com/reizt/todo/src/core"
 )
 
@@ -37,6 +39,9 @@ func (controller *Controller) Exec(osArgs []string) {
 	case "mod":
 		input := newModInput(osArgs)
 		controller.App.Mod(*input)
+	case "fin":
+		input := newFinInput(osArgs)
+		controller.App.Fin(*input)
 	case "del":
 		input := newDelInput(osArgs)
 		controller.App.Del(*input)
@@ -73,6 +78,7 @@ func newAddInput(osArgs []string) *core.AddInput {
 
 	title := (*string)(nil)
 	description := (*string)(nil)
+	isCompleted := (*bool)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
 		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
@@ -85,10 +91,20 @@ func newAddInput(osArgs []string) *core.AddInput {
 			i++
 			continue
 		}
+		if osArgs[i] == "-c" || osArgs[i] == "--completed" {
+			if len(osArgs) >= i+2 && osArgs[i+1] == "false" {
+				isCompleted = utils.Ptr(false)
+				i++
+			} else {
+				isCompleted = utils.Ptr(true)
+			}
+			continue
+		}
 	}
 	input := core.AddInput{
 		Title:       title,
 		Description: description,
+		IsCompleted: isCompleted,
 	}
 	return &input
 }
@@ -109,6 +125,7 @@ func newModInput(osArgs []string) *core.ModInput {
 	id := osArgs[2]
 	title := (*string)(nil)
 	description := (*string)(nil)
+	isCompleted := (*bool)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
 		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
@@ -121,12 +138,25 @@ func newModInput(osArgs []string) *core.ModInput {
 			i++
 			continue
 		}
+		if osArgs[i] == "-c" || osArgs[i] == "--completed" {
+			if len(osArgs) >= i+2 && osArgs[i+1] == "true" {
+				isCompleted = utils.Ptr(true)
+				i++
+			} else if len(osArgs) >= i+2 && osArgs[i+1] == "false" {
+				isCompleted = utils.Ptr(false)
+				i++
+			} else {
+				isCompleted = utils.Ptr(true)
+			}
+			continue
+		}
 	}
 
 	input := core.ModInput{
 		ID:          id,
 		Title:       title,
 		Description: description,
+		IsCompleted: isCompleted,
 	}
 	return &input
 }
@@ -143,6 +173,23 @@ func newDelInput(osArgs []string) *core.DelInput {
 
 	id := osArgs[2]
 	input := core.DelInput{
+		ID: id,
+	}
+	return &input
+}
+
+/*
+newFinInput
+
+	todo fin <id>
+*/
+func newFinInput(osArgs []string) *core.FinInput {
+	if len(os.Args) < 3 {
+		return &core.FinInput{}
+	}
+
+	id := osArgs[2]
+	input := core.FinInput{
 		ID: id,
 	}
 	return &input

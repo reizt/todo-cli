@@ -58,6 +58,10 @@ func (renderer) DelHelp() {
 	fmt.Println(`USAGE: todo del <id>`)
 }
 
+func (renderer) FinHelp() {
+	fmt.Println(`USAGE: todo fin <id>`)
+}
+
 func (renderer) TitleIsRequired() {
 	utils.PrintRed("Title is required.\n")
 }
@@ -76,9 +80,13 @@ func (renderer) UnexpectedError() {
 
 func (renderer) List(todos []core.Todo) {
 	writer := tabwriter.NewWriter(os.Stdout, 0, 0, 4, ' ', 0)
-	fmt.Fprintln(writer, "ID\tTitle\tDescription\t")
+	fmt.Fprintln(writer, "Fin\tID\tTitle\tDescription\t")
 	for _, todo := range todos {
-		fmt.Fprintf(writer, "%s\t%s\t%s\t\n", todo.ID, utils.NilSafe(todo.Title), utils.NilSafe(todo.Description))
+		finStr := ""
+		if todo.IsCompleted != nil && *todo.IsCompleted {
+			finStr = finStr + "✓"
+		}
+		fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t\n", finStr, todo.ID, utils.NilSafe(todo.Title), utils.NilSafe(todo.Description))
 	}
 	writer.Flush()
 }
@@ -130,4 +138,13 @@ func (renderer) ClearFailed(err error) {
 
 func (renderer) ClearCanceled() {
 	fmt.Println("Canceled.")
+}
+
+func (renderer) FinSucceeded(todo core.Todo) {
+	utils.PrintGreen("Todo was completed.\n")
+}
+
+func (renderer) FinFailed(err error) {
+	utils.PrintRed("ERROR: Failed to finish todo.\n")
+	utils.PrintRed(err.Error())
 }

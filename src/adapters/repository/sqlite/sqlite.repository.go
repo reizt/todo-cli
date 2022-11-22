@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -17,10 +19,12 @@ var (
 		ID          string
 		Title       string
 		Description string
+		IsCompleted string
 	}{
 		ID:          "id",
 		Title:       "title",
 		Description: "description",
+		IsCompleted: "isCompleted",
 	}
 	ErrDatabaseInit  = errors.New("failed to init database")
 	ErrDatabaseClose = errors.New("failed to close database")
@@ -36,6 +40,7 @@ func migrate(db *sql.DB) error {
 			` + todoColumnNames.ID + ` VARCHAR(255) NOT NULL,
 			` + todoColumnNames.Title + ` VARCHAR(255) NOT NULL,
 			` + todoColumnNames.Description + ` TEXT,
+			` + todoColumnNames.IsCompleted + ` BOOLEAN NOT NULL DEFAULT false,
 			PRIMARY KEY (id)
 		);
 	`
@@ -86,7 +91,7 @@ func (repo repository) FindMany(input core.IRepositoryFindManyInput) (*([]core.T
 	todos := []core.Todo{}
 	for rows.Next() {
 		todo := core.Todo{}
-		if err := rows.Scan(&todo.ID, &todo.Title, &todo.Description); err != nil {
+		if err := rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsCompleted); err != nil {
 			return nil, core.ErrRepositoryUnexpected
 		}
 		todos = append(todos, todo)
@@ -106,7 +111,7 @@ func (repo repository) FindById(id string) (*(core.Todo), error) {
 	}
 
 	todo := core.Todo{}
-	if err := row.Scan(&todo.ID, &todo.Title, &todo.Description); err != nil {
+	if err := row.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsCompleted); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, core.ErrRepositoryNotFound
 		}
@@ -118,13 +123,14 @@ func (repo repository) FindById(id string) (*(core.Todo), error) {
 
 func (repo repository) Insert(input core.IRepositoryInsertInput) (*core.Todo, error) {
 	insertQuery := fmt.Sprintf(
-		"INSERT INTO %s (%s, %s, %s) VALUES (?, ?, ?);",
+		"INSERT INTO %s (%s, %s, %s), %s VALUES (?, ?, ?, ?);",
 		todoTableName,
 		todoColumnNames.ID,
 		todoColumnNames.Title,
 		todoColumnNames.Description,
+		todoColumnNames.IsCompleted,
 	)
-	_, err := repo.db.Exec(insertQuery, input.ID, input.Title, input.Description)
+	_, err := repo.db.Exec(insertQuery, input.ID, input.Title, input.Description, input.IsCompleted)
 	if err != nil {
 		return nil, core.ErrRepositoryInsertFailed
 	}
@@ -134,33 +140,31 @@ func (repo repository) Insert(input core.IRepositoryInsertInput) (*core.Todo, er
 }
 
 func (repo repository) Update(id string, input core.IRepositoryUpdateInput) (err error) {
-	if input.Title != nil && input.Description != nil {
-		updateQuery := fmt.Sprintf(
-			"UPDATE %s SET %s = ?, %s = ? WHERE %s = ?;",
-			todoTableName,
-			todoColumnNames.Title,
-			todoColumnNames.Description,
-			todoColumnNames.ID,
-		)
-		_, err = repo.db.Exec(updateQuery, input.Title, input.Description, id)
-	} else if input.Title != nil {
-		updateQuery := fmt.Sprintf(
-			"UPDATE %s SET %s = ? WHERE %s = ?;",
-			todoTableName,
-			todoColumnNames.Title,
-			todoColumnNames.ID,
-		)
-		_, err = repo.db.Exec(updateQuery, input.Title, id)
-	} else if input.Description != nil {
-		updateQuery := fmt.Sprintf(
-			"UPDATE %s SET %s = ? WHERE %s = ?;",
-			todoTableName,
-			todoColumnNames.Description,
-			todoColumnNames.ID,
-		)
-		_, err = repo.db.Exec(updateQuery, input.Description, id)
+	setQueries := make([]string, 0)
+	setValues := []any{}
+	if input.Title != nil {
+		setQueries = append(setQueries, fmt.Sprintf("%s = ?", todoColumnNames.Title))
+		setValues = append(setValues, *input.Title)
 	}
+	if input.Description != nil {
+		setQueries = append(setQueries, fmt.Sprintf("%s = ?", todoColumnNames.Description))
+		setValues = append(setValues, *input.Description)
+	}
+	if input.IsCompleted != nil {
+		setQueries = append(setQueries, fmt.Sprintf("%s = ?", todoColumnNames.IsCompleted))
+		boolStr := strconv.FormatBool(*input.IsCompleted)
+		setValues = append(setValues, boolStr)
+	}
+	setValues = append(setValues, any(id))
+	updateQuery := fmt.Sprintf(
+		"UPDATE %s SET %s WHERE %s = ?;",
+		todoTableName,
+		strings.Join(setQueries, ", "),
+		todoColumnNames.ID,
+	)
+	_, err = repo.db.Exec(updateQuery, setValues...)
 	if err != nil {
+		fmt.Println(err.Error())
 		return core.ErrRepositoryUpdateFailed
 	}
 

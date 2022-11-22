@@ -1,5 +1,9 @@
 package core
 
+import (
+	"github.com/reizt/todo/src/utils"
+)
+
 const (
 	cliVersion = "v1.0.0"
 )
@@ -50,6 +54,7 @@ func (app *App) List(input ListInput) {
 type AddInput struct {
 	Title       *string
 	Description *string
+	IsCompleted *bool
 }
 
 func (app *App) Add(input AddInput) {
@@ -58,6 +63,7 @@ func (app *App) Add(input AddInput) {
 		ID:          id,
 		Title:       input.Title,
 		Description: input.Description,
+		IsCompleted: input.IsCompleted,
 	}
 	isValid := app.validateTodo(todo)
 	if !isValid {
@@ -84,6 +90,7 @@ type ModInput struct {
 	ID          string
 	Title       *string
 	Description *string
+	IsCompleted *bool
 }
 
 func (app *App) Mod(input ModInput) {
@@ -108,6 +115,9 @@ func (app *App) Mod(input ModInput) {
 	if input.Description != nil {
 		todo.Description = input.Description
 	}
+	if input.IsCompleted != nil {
+		todo.IsCompleted = input.IsCompleted
+	}
 	isValid := app.validateTodo(*todo)
 	if !isValid {
 		app.Renderer.ModHelp()
@@ -117,6 +127,7 @@ func (app *App) Mod(input ModInput) {
 	err = app.Repository.Update(todo.ID, IRepositoryUpdateInput{
 		Title:       input.Title,
 		Description: input.Description,
+		IsCompleted: input.IsCompleted,
 	})
 	if err != nil {
 		app.Renderer.ModFailedToUpdate(err)
@@ -182,4 +193,42 @@ func (app *App) Clear() {
 	}
 
 	app.Renderer.ClearSucceeded()
+}
+
+type FinInput struct {
+	ID string
+}
+
+func (app *App) Fin(input FinInput) {
+	if input.ID == "" {
+		app.Renderer.FinHelp()
+		return
+	}
+
+	todo, err := app.Repository.FindById(input.ID)
+	if err != nil {
+		if err == ErrRepositoryNotFound {
+			app.Renderer.NotFound(input.ID)
+			return
+		}
+		app.Renderer.UnexpectedError()
+		return
+	}
+
+	err = app.Repository.Update(todo.ID, IRepositoryUpdateInput{
+		IsCompleted: utils.Ptr(true),
+	})
+	if err != nil {
+		app.Renderer.FinFailed(err)
+		return
+	}
+
+	app.Renderer.FinSucceeded(*todo)
+
+	todos, err := app.Repository.FindMany(IRepositoryFindManyInput{})
+	if err != nil {
+		app.Renderer.ListFailedToFindMany(err)
+		return
+	}
+	app.Renderer.List(*todos)
 }
