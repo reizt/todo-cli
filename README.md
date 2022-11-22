@@ -20,7 +20,7 @@ It uses sqlite3 for storage so you have to specify the path to storage like this
 export TODO_CLI_SQLITE_STORAGE_PATH="/path/to/sqlite/file"
 ```
 
-Then you can use TODO CLI!
+## How to use
 
 ```sh
 $ todo add -t "Fix a bug" -d "It's hard work."
