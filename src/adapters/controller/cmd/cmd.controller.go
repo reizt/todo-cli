@@ -30,22 +30,22 @@ func (controller *Controller) Exec(osArgs []string) {
 		controller.App.Help()
 	case "-v", "--version":
 		controller.App.Version()
-	case "list":
+	case "list", "l":
 		input := newListInput(osArgs)
 		controller.App.List(*input)
-	case "add":
+	case "add", "a":
 		input := newAddInput(osArgs)
 		controller.App.Add(*input)
-	case "mod":
+	case "mod", "m":
 		input := newModInput(osArgs)
 		controller.App.Mod(*input)
-	case "fin":
+	case "fin", "f":
 		input := newFinInput(osArgs)
 		controller.App.Fin(*input)
-	case "del":
+	case "del", "d":
 		input := newDelInput(osArgs)
 		controller.App.Del(*input)
-	case "clear":
+	case "clear", "c":
 		controller.App.Clear()
 	default:
 		controller.App.Help()
