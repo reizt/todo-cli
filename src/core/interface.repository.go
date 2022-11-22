@@ -31,11 +31,11 @@ type IRepositoryInsertInput struct {
 	ID          string
 	Title       *string
 	Description *string
-	IsCompleted *bool
+	IsFinished  *bool
 }
 
 type IRepositoryUpdateInput struct {
 	Title       *string
 	Description *string
-	IsCompleted *bool
+	IsFinished  *bool
 }

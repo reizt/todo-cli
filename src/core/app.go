@@ -54,20 +54,20 @@ func (app *App) List(input ListInput) {
 type AddInput struct {
 	Title       *string
 	Description *string
-	IsCompleted *bool
+	IsFinished  *bool
 }
 
 func (app *App) Add(input AddInput) {
 	id := newId()
-	IsCompleted := false
-	if input.IsCompleted != nil && *input.IsCompleted {
-		IsCompleted = true
+	IsFinished := false
+	if input.IsFinished != nil && *input.IsFinished {
+		IsFinished = true
 	}
 	todo := Todo{
 		ID:          id,
 		Title:       input.Title,
 		Description: input.Description,
-		IsCompleted: &IsCompleted,
+		IsFinished:  &IsFinished,
 	}
 	isValid := app.validateTodo(todo)
 	if !isValid {
@@ -94,7 +94,7 @@ type ModInput struct {
 	ID          string
 	Title       *string
 	Description *string
-	IsCompleted *bool
+	IsFinished  *bool
 }
 
 func (app *App) Mod(input ModInput) {
@@ -119,8 +119,8 @@ func (app *App) Mod(input ModInput) {
 	if input.Description != nil {
 		todo.Description = input.Description
 	}
-	if input.IsCompleted != nil {
-		todo.IsCompleted = input.IsCompleted
+	if input.IsFinished != nil {
+		todo.IsFinished = input.IsFinished
 	}
 	isValid := app.validateTodo(*todo)
 	if !isValid {
@@ -131,7 +131,7 @@ func (app *App) Mod(input ModInput) {
 	err = app.Repository.Update(todo.ID, IRepositoryUpdateInput{
 		Title:       input.Title,
 		Description: input.Description,
-		IsCompleted: input.IsCompleted,
+		IsFinished:  input.IsFinished,
 	})
 	if err != nil {
 		app.Renderer.ModFailedToUpdate(err)
@@ -220,7 +220,7 @@ func (app *App) Fin(input FinInput) {
 	}
 
 	err = app.Repository.Update(todo.ID, IRepositoryUpdateInput{
-		IsCompleted: utils.Ptr(true),
+		IsFinished: utils.Ptr(true),
 	})
 	if err != nil {
 		app.Renderer.FinFailed(err)

@@ -78,7 +78,7 @@ func newAddInput(osArgs []string) *core.AddInput {
 
 	title := (*string)(nil)
 	description := (*string)(nil)
-	isCompleted := (*bool)(nil)
+	isFinished := (*bool)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
 		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
@@ -93,10 +93,10 @@ func newAddInput(osArgs []string) *core.AddInput {
 		}
 		if osArgs[i] == "-c" || osArgs[i] == "--completed" {
 			if len(osArgs) >= i+2 && osArgs[i+1] == "false" {
-				isCompleted = utils.Ptr(false)
+				isFinished = utils.Ptr(false)
 				i++
 			} else {
-				isCompleted = utils.Ptr(true)
+				isFinished = utils.Ptr(true)
 			}
 			continue
 		}
@@ -104,7 +104,7 @@ func newAddInput(osArgs []string) *core.AddInput {
 	input := core.AddInput{
 		Title:       title,
 		Description: description,
-		IsCompleted: isCompleted,
+		IsFinished:  isFinished,
 	}
 	return &input
 }
@@ -125,7 +125,7 @@ func newModInput(osArgs []string) *core.ModInput {
 	id := osArgs[2]
 	title := (*string)(nil)
 	description := (*string)(nil)
-	isCompleted := (*bool)(nil)
+	isFinished := (*bool)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
 		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
@@ -140,13 +140,13 @@ func newModInput(osArgs []string) *core.ModInput {
 		}
 		if osArgs[i] == "-c" || osArgs[i] == "--completed" {
 			if len(osArgs) >= i+2 && osArgs[i+1] == "true" {
-				isCompleted = utils.Ptr(true)
+				isFinished = utils.Ptr(true)
 				i++
 			} else if len(osArgs) >= i+2 && osArgs[i+1] == "false" {
-				isCompleted = utils.Ptr(false)
+				isFinished = utils.Ptr(false)
 				i++
 			} else {
-				isCompleted = utils.Ptr(true)
+				isFinished = utils.Ptr(true)
 			}
 			continue
 		}
@@ -156,7 +156,7 @@ func newModInput(osArgs []string) *core.ModInput {
 		ID:          id,
 		Title:       title,
 		Description: description,
-		IsCompleted: isCompleted,
+		IsFinished:  isFinished,
 	}
 	return &input
 }

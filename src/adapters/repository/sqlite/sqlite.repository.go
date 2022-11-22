@@ -19,12 +19,12 @@ var (
 		ID          string
 		Title       string
 		Description string
-		IsCompleted string
+		IsFinished  string
 	}{
 		ID:          "id",
 		Title:       "title",
 		Description: "description",
-		IsCompleted: "isCompleted",
+		IsFinished:  "isFinished",
 	}
 	ErrDatabaseInit  = errors.New("failed to init database")
 	ErrDatabaseClose = errors.New("failed to close database")
@@ -40,7 +40,7 @@ func migrate(db *sql.DB) error {
 			` + todoColumnNames.ID + ` VARCHAR(255) NOT NULL,
 			` + todoColumnNames.Title + ` VARCHAR(255) NOT NULL,
 			` + todoColumnNames.Description + ` TEXT,
-			` + todoColumnNames.IsCompleted + ` BOOLEAN NOT NULL DEFAULT false,
+			` + todoColumnNames.IsFinished + ` BOOLEAN NOT NULL DEFAULT false,
 			PRIMARY KEY (id)
 		);
 	`
@@ -91,7 +91,7 @@ func (repo repository) FindMany(input core.IRepositoryFindManyInput) (*([]core.T
 	todos := []core.Todo{}
 	for rows.Next() {
 		todo := core.Todo{}
-		if err := rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsCompleted); err != nil {
+		if err := rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsFinished); err != nil {
 			return nil, core.ErrRepositoryUnexpected
 		}
 		todos = append(todos, todo)
@@ -111,7 +111,7 @@ func (repo repository) FindById(id string) (*(core.Todo), error) {
 	}
 
 	todo := core.Todo{}
-	if err := row.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsCompleted); err != nil {
+	if err := row.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsFinished); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, core.ErrRepositoryNotFound
 		}
@@ -128,9 +128,9 @@ func (repo repository) Insert(input core.IRepositoryInsertInput) (*core.Todo, er
 		todoColumnNames.ID,
 		todoColumnNames.Title,
 		todoColumnNames.Description,
-		todoColumnNames.IsCompleted,
+		todoColumnNames.IsFinished,
 	)
-	_, err := repo.db.Exec(insertQuery, input.ID, input.Title, input.Description, input.IsCompleted)
+	_, err := repo.db.Exec(insertQuery, input.ID, input.Title, input.Description, input.IsFinished)
 	if err != nil {
 		fmt.Println(err.Error())
 		fmt.Println(insertQuery)
@@ -152,9 +152,9 @@ func (repo repository) Update(id string, input core.IRepositoryUpdateInput) (err
 		setQueries = append(setQueries, fmt.Sprintf("%s = ?", todoColumnNames.Description))
 		setValues = append(setValues, *input.Description)
 	}
-	if input.IsCompleted != nil {
-		setQueries = append(setQueries, fmt.Sprintf("%s = ?", todoColumnNames.IsCompleted))
-		boolStr := strconv.FormatBool(*input.IsCompleted)
+	if input.IsFinished != nil {
+		setQueries = append(setQueries, fmt.Sprintf("%s = ?", todoColumnNames.IsFinished))
+		boolStr := strconv.FormatBool(*input.IsFinished)
 		setValues = append(setValues, boolStr)
 	}
 	setValues = append(setValues, any(id))

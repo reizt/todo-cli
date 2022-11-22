@@ -83,7 +83,7 @@ func (renderer) List(todos []core.Todo) {
 	fmt.Fprintln(writer, "Fin\tID\tTitle\tDescription\t")
 	for _, todo := range todos {
 		finStr := ""
-		if todo.IsCompleted != nil && *todo.IsCompleted {
+		if todo.IsFinished != nil && *todo.IsFinished {
 			finStr = finStr + "✓"
 		}
 		fmt.Fprintf(writer, "%s\t%s\t%s\t%s\t\n", finStr, todo.ID, utils.NilSafe(todo.Title), utils.NilSafe(todo.Description))
