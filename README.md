@@ -23,6 +23,32 @@ export TODO_CLI_SQLITE_STORAGE_PATH="/path/to/sqlite/file"
 ## How to use
 
 ```sh
+$ todo --help
+Manage your TODO by CLI
+
+USAGE
+        todo <command> [flags]
+
+COMMANDS
+        list:   List todo
+        add:    Add todo
+        mod:    Modify todo
+        del:    Delete todo
+
+FLAGS
+        list
+        add
+                -t, --title       Title
+                -d, --description Description
+        mod <id>
+                -t, --title       Title
+                -d, --description Description
+        del <id>
+```
+
+Examples
+
+```sh
 $ todo add -t "Fix a bug" -d "It's hard work."
 # Todo was added successfully.
 # ID        Title         Description
