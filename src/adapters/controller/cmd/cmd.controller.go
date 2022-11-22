@@ -75,12 +75,12 @@ func newAddInput(osArgs []string) *core.AddInput {
 	description := (*string)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
-		if osArgs[i] == "-t" || osArgs[i] == "--title" {
+		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
 			title = &osArgs[i+1]
 			i++
 			continue
 		}
-		if osArgs[i] == "-d" || osArgs[i] == "--description" {
+		if (osArgs[i] == "-d" || osArgs[i] == "--description") && len(osArgs) >= i+2 {
 			description = &osArgs[i+1]
 			i++
 			continue
@@ -111,12 +111,12 @@ func newModInput(osArgs []string) *core.ModInput {
 	description := (*string)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
-		if osArgs[i] == "-t" || osArgs[i] == "--title" {
+		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
 			title = &osArgs[i+1]
 			i++
 			continue
 		}
-		if osArgs[i] == "-d" || osArgs[i] == "--description" {
+		if (osArgs[i] == "-d" || osArgs[i] == "--description") && len(osArgs) >= i+2 {
 			description = &osArgs[i+1]
 			i++
 			continue
