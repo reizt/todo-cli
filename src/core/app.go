@@ -38,11 +38,15 @@ func (app *App) Help() {
 }
 
 type ListInput struct {
-	//
+	OnlyUnFinished bool
 }
 
 func (app *App) List(input ListInput) {
-	todos, err := app.Repository.FindMany(IRepositoryFindManyInput{})
+	repositoryFindManyInput := IRepositoryFindManyInput{}
+	if input.OnlyUnFinished {
+		repositoryFindManyInput.Finished = utils.Ptr(false)
+	}
+	todos, err := app.Repository.FindMany(repositoryFindManyInput)
 	if err != nil {
 		app.Renderer.ListFailedToFindMany(err)
 		return

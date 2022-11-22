@@ -24,7 +24,7 @@ type IRepository interface {
 }
 
 type IRepositoryFindManyInput struct {
-	// Add later
+	Finished *bool
 }
 
 type IRepositoryInsertInput struct {

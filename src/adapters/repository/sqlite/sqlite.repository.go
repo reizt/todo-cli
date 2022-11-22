@@ -82,7 +82,15 @@ func (repo repository) Close() error {
 }
 
 func (repo repository) FindMany(input core.IRepositoryFindManyInput) (*([]core.Todo), error) {
-	rows, err := repo.db.Query("SELECT * FROM todo;")
+	query := "SELECT * FROM todo"
+	where := "WHERE"
+	if input.Finished != nil {
+		where = where + fmt.Sprintf(" %s = '%s'", todoColumnNames.IsFinished, strconv.FormatBool(*input.Finished))
+	}
+	if where != "WHERE" {
+		query = query + " " + where
+	}
+	rows, err := repo.db.Query(query)
 	if err != nil {
 		return nil, core.ErrRepositoryFindMany
 	}

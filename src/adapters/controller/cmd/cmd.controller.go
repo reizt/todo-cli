@@ -60,7 +60,16 @@ newListInput
 			-v, --verbose Detailed list
 */
 func newListInput(osArgs []string) *core.ListInput {
-	input := core.ListInput{}
+	OnlyUnFinished := false
+
+	for i := 0; i < len(osArgs); i++ {
+		if osArgs[i] == "-u" {
+			OnlyUnFinished = true
+		}
+	}
+	input := core.ListInput{
+		OnlyUnFinished: OnlyUnFinished,
+	}
 	return &input
 }
 
@@ -76,35 +85,35 @@ func newAddInput(osArgs []string) *core.AddInput {
 		return &core.AddInput{}
 	}
 
-	title := (*string)(nil)
-	description := (*string)(nil)
-	isFinished := (*bool)(nil)
+	Title := (*string)(nil)
+	Description := (*string)(nil)
+	IsFinished := (*bool)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
 		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
-			title = &osArgs[i+1]
+			Title = &osArgs[i+1]
 			i++
 			continue
 		}
 		if (osArgs[i] == "-d" || osArgs[i] == "--description") && len(osArgs) >= i+2 {
-			description = &osArgs[i+1]
+			Description = &osArgs[i+1]
 			i++
 			continue
 		}
 		if osArgs[i] == "-c" || osArgs[i] == "--completed" {
 			if len(osArgs) >= i+2 && osArgs[i+1] == "false" {
-				isFinished = utils.Ptr(false)
+				IsFinished = utils.Ptr(false)
 				i++
 			} else {
-				isFinished = utils.Ptr(true)
+				IsFinished = utils.Ptr(true)
 			}
 			continue
 		}
 	}
 	input := core.AddInput{
-		Title:       title,
-		Description: description,
-		IsFinished:  isFinished,
+		Title:       Title,
+		Description: Description,
+		IsFinished:  IsFinished,
 	}
 	return &input
 }
@@ -122,41 +131,37 @@ func newModInput(osArgs []string) *core.ModInput {
 		return &core.ModInput{}
 	}
 
-	id := osArgs[2]
-	title := (*string)(nil)
-	description := (*string)(nil)
-	isFinished := (*bool)(nil)
+	ID := osArgs[2]
+	Title := (*string)(nil)
+	Description := (*string)(nil)
+	IsFinished := (*bool)(nil)
 
 	for i := 0; i < len(osArgs); i++ {
 		if (osArgs[i] == "-t" || osArgs[i] == "--title") && len(osArgs) >= i+2 {
-			title = &osArgs[i+1]
+			Title = &osArgs[i+1]
 			i++
 			continue
 		}
 		if (osArgs[i] == "-d" || osArgs[i] == "--description") && len(osArgs) >= i+2 {
-			description = &osArgs[i+1]
+			Description = &osArgs[i+1]
 			i++
 			continue
 		}
 		if osArgs[i] == "-c" || osArgs[i] == "--completed" {
-			if len(osArgs) >= i+2 && osArgs[i+1] == "true" {
-				isFinished = utils.Ptr(true)
-				i++
-			} else if len(osArgs) >= i+2 && osArgs[i+1] == "false" {
-				isFinished = utils.Ptr(false)
+			if len(osArgs) >= i+2 && osArgs[i+1] == "false" {
+				IsFinished = utils.Ptr(false)
 				i++
 			} else {
-				isFinished = utils.Ptr(true)
+				IsFinished = utils.Ptr(true)
 			}
 			continue
 		}
 	}
-
 	input := core.ModInput{
-		ID:          id,
-		Title:       title,
-		Description: description,
-		IsFinished:  isFinished,
+		ID:          ID,
+		Title:       Title,
+		Description: Description,
+		IsFinished:  IsFinished,
 	}
 	return &input
 }
