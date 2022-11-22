@@ -36,10 +36,10 @@ FLAGS
 	add
 		-t, --title       Title
 		-d, --description Description
-		mod <id>
+	mod <id>
 		-t, --title       Title
 		-d, --description Description
-		del <id>`)
+	del <id>`)
 }
 
 func (renderer) AddHelp() {
